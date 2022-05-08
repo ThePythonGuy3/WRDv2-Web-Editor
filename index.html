@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<title>WRDv2 Editor</title>
+		<link rel="icon" href="./resources/icon.png">
+
+		<link rel="stylesheet" href="./css/main.css">
+
+		<script type="text/javascript" src="./js/main.js"></script>
+	</head>
+	<body style="overflow: hidden;">
+		<div id="topbar">
+			<a href="https://github.com/ThePythonGuy3" target="_blank"><img alt="Tool creator" src="https://avatars.githubusercontent.com/u/45978337" style="width: 40px; height: 40px; border-radius: 5px; user-select: none;"></a>
+			<p style="margin-left: 10px; line-height: 10px; user-select: none; color: #303030;">Wastelands Room Data v2 Editor by ThePythonGuy</p>
+		</div>
+
+		<div id="main">
+			<div id="tools">
+				
+			</div>
+
+			<div id="mapPureContainer">
+				<div style="display: flex;">
+					<p>Connections:</p>
+
+					<div id="connections">
+						<p class="check" style="left: 20px;">Down</p>
+						<input id="D" type="checkbox" class="dirCheck" style="left: 0px;" checked>
+
+						<p class="check" style="left: 75px;">Left</p>
+						<input id="L" type="checkbox" class="dirCheck" style="left: 55px;" checked>
+
+						<p class="check" style="left: 120px;">Up</p>
+						<input id="U" type="checkbox" class="dirCheck" style="left: 100px;" checked>
+
+						<p class="check" style="left: 160px;">Right</p>
+						<input id="R" type="checkbox" class="dirCheck" style="left: 140px;" checked>
+					</div>
+				</div>
+
+				<div id="mapContainer">
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

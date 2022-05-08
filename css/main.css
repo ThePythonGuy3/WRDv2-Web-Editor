@@ -1,0 +1,111 @@
+* {
+	user-select: none;
+}
+
+p {
+	font-family: verdana;
+	font-size: 15px;
+}
+
+img {
+	-ms-interpolation-mode: nearest-neighbor;
+	image-rendering: crisp-edges;
+	image-rendering: pixelated;
+}
+
+input {
+	font-family: verdana;
+	font-size: 15px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+input[type=number] {
+ 	-moz-appearance: textfield;
+}
+
+#topbar {
+	display: flex;
+
+	font-weight: bold;
+
+	position: absolute;
+	left: 0;
+	top: 0;
+
+	width: 100vw;
+	height: 47px;
+
+	background: #FEFEFE;
+	border-bottom: 2px solid #F0F0F0;
+
+	padding-left: 10px;
+	padding-top: 10px;
+}
+
+#main {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	width: 100vw;
+
+	position: absolute;
+	top: 60px;
+}
+
+#mapPureContainer {
+	position: relative;
+}
+
+#mapContainer {
+	position: relative;
+	background-color: #505050;
+}
+
+#connections {
+	position: relative;
+}
+
+.tileImg {
+	width: 10px;
+	height: 10px;
+}
+
+.tile {
+	position: absolute;
+
+	width: 12px;
+	height: 12px;
+}
+
+.tile:hover {
+	filter: brightness(0.5);
+}
+
+.tile:active {
+	pointer-events: none;
+}
+
+.activePath {
+	filter: brightness(0.3) !important;
+}
+
+.check {
+	position: absolute;
+	top: 3px;
+
+	margin-top: 15px;
+	margin-right: 10px;
+
+	font-size: 12px;
+}
+
+.dirCheck {
+	position: absolute;
+	top: 16px;
+}
