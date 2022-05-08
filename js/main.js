@@ -45,6 +45,13 @@ window.onload = () => {
 	let up = element("U");
 	let right = element("R");
 
+	let buttons = classes("toolButton");
+
+	for(let i = 0; i < buttons.length; i++){
+		buttons[i].src = "./resources/icons/" + buttons[i].id + ".png";
+		buttons[i].title = buttons[i].id[0].toUpperCase() + buttons[i].id.slice(1);
+	}
+
 	down.onchange = () => {
 		actOnPath(1, down.checked);
 	}
@@ -64,6 +71,9 @@ window.onload = () => {
 	nightCheck.onchange = () => {
 		root.style.setProperty("--bg-color", nightCheck.checked ? "#202030" : "#FEFEFE");
 		root.style.setProperty("--text-color", nightCheck.checked ? "#FEFEFE" : "#303030");
+
+		root.style.setProperty("--button-bg-hover", nightCheck.checked ? "#DEDEDE" : "#AEAEAE");
+		root.style.setProperty("--button-bg-active", nightCheck.checked ? "#FEFEFE" : "#8E8E8E");
 	}
 
 	mapContainer.style.width = size[0] * 12 + 6 + "px";

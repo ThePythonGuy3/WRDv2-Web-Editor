@@ -1,6 +1,10 @@
 :root {
 	--text-color: #303030;
 	--bg-color: #FEFEFE;
+
+	--button-bg: #BEBEBE;
+	--button-bg-hover: #AEAEAE;
+	--button-bg-active: #8E8E8E;
 }
 
 * {
@@ -33,14 +37,13 @@ input {
 	font-size: 15px;
 }
 
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-	-webkit-appearance: none;
-	margin: 0;
+input:checked + .slider {
+	background-color: #505050;
 }
 
-input[type=number] {
- 	-moz-appearance: textfield;
+input:checked + .slider:before {
+	background-color: #EEEEEE;
+	transform: translateX(26px);
 }
 
 #topbar {
@@ -73,10 +76,13 @@ input[type=number] {
 
 	position: absolute;
 	top: 60px;
+	left: 0;
 }
 
 #mapPureContainer {
 	position: relative;
+
+	margin: 0;
 }
 
 #mapContainer {
@@ -94,6 +100,10 @@ input[type=number] {
 	top: 20px;
 
 	right: 10px;
+}
+
+#tools {
+	display: flex;
 }
 
 .switch {
@@ -137,15 +147,6 @@ input[type=number] {
 	border-radius: 30px;
 }
 
-input:checked + .slider {
-	background-color: #505050;
-}
-
-input:checked + .slider:before {
-	background-color: #EEEEEE;
-	transform: translateX(26px);
-}
-
 .tileImg {
 	width: 10px;
 	height: 10px;
@@ -183,4 +184,32 @@ input:checked + .slider:before {
 .dirCheck {
 	position: absolute;
 	top: 16px;
+}
+
+.toolButton {
+	width: 32px;
+	height: 32px;
+	border-radius: 5px;
+
+	background-color: var(--button-bg);
+
+	margin: 3px;
+
+	transition: 300ms;
+
+	cursor: pointer;
+}
+
+.toolButton:hover {
+	background-color: var(--button-bg-hover);
+}
+
+.toolButton:active {
+	background-color: var(--button-bg-active);
+
+	transition: 50ms;
+}
+
+.separator {
+	width: 10px;
 }
