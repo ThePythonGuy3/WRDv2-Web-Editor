@@ -5,6 +5,11 @@
 	--button-bg: #BEBEBE;
 	--button-bg-hover: #AEAEAE;
 	--button-bg-active: #8E8E8E;
+
+	--brush-color: var(--button-bg-active);
+	--line-color: var(--button-bg);
+	--rect-color: var(--button-bg);
+	--select-color: var(--button-bg);
 }
 
 * {
@@ -106,6 +111,22 @@ input:checked + .slider:before {
 	display: flex;
 }
 
+#brush {
+	background-color: var(--brush-color);
+}
+
+#line {
+	background-color: var(--line-color) !important;
+}
+
+#rect {
+	background-color: var(--rect-color) !important;
+}
+
+#select {
+	background-color: var(--select-color) !important;
+}
+
 .switch {
 	position: relative;
 	display: inline-block;
@@ -168,7 +189,7 @@ input:checked + .slider:before {
 }
 
 .activePath {
-	filter: brightness(0.3) !important;
+	filter: opacity(0); !important;
 }
 
 .check {

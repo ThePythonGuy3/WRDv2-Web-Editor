@@ -32,8 +32,28 @@ let actOnPath = (path, hide) => {
 	}
 }
 
+let paintTile = (tiles, x, y) => {
+	for(let i = 0; i < tiles.length; i++){
+		if(tiles[i].getAttribute("x") == x - 1 && tiles[i].getAttribute("y") == y - 1){
+			if(tiles[i].className.includes("activePath")) break;
+			tiles[i].children[0].src = "./resources/tiles/C.png";
+			break;
+		}
+	}
+}
+
 let zoom = 1;
 const z_speed = 0.2;
+
+let tool = 1;
+
+let clearTools = root => {
+	root.style.setProperty("--brush-color", "#BEBEBE");
+	root.style.setProperty("--line-color", "#BEBEBE");
+	root.style.setProperty("--rect-color", "#BEBEBE");
+	root.style.setProperty("--select-color", "#BEBEBE");
+};
+
 window.onload = () => {
 	let root = document.querySelector(":root");
 
@@ -47,10 +67,10 @@ window.onload = () => {
 
 	let buttons = classes("toolButton");
 
-	for(let i = 0; i < buttons.length; i++){
-		buttons[i].src = "./resources/icons/" + buttons[i].id + ".png";
-		buttons[i].title = buttons[i].id[0].toUpperCase() + buttons[i].id.slice(1);
-	}
+	let brush = element("brush");
+	let line = element("line");
+	let rect = element("rect");
+	let select = element("select");
 
 	down.onchange = () => {
 		actOnPath(1, down.checked);
@@ -68,13 +88,51 @@ window.onload = () => {
 		actOnPath(4, right.checked);
 	}
 
+	for(let i = 0; i < buttons.length; i++){
+		buttons[i].src = "./resources/icons/" + buttons[i].id + ".png";
+		buttons[i].title = buttons[i].id[0].toUpperCase() + buttons[i].id.slice(1);
+	}
+
+	brush.onclick = () => {
+		tool = 1;
+
+		clearTools(root);
+
+		root.style.setProperty("--brush-color", getComputedStyle(root).getPropertyValue("--button-bg-active"));
+	}
+
+	line.onclick = () => {
+		tool = 2;
+
+		clearTools(root);
+
+		root.style.setProperty("--line-color", getComputedStyle(root).getPropertyValue("--button-bg-active"));
+	}
+
+	rect.onclick = () => {
+		tool = 3;
+
+		clearTools(root);
+
+		root.style.setProperty("--rect-color", getComputedStyle(root).getPropertyValue("--button-bg-active"));
+	}
+
+	select.onclick = () => {
+		tool = 4;
+
+		clearTools(root);
+
+		root.style.setProperty("--select-color", getComputedStyle(root).getPropertyValue("--button-bg-active"));
+	}
+
 	nightCheck.onchange = () => {
-		root.style.setProperty("--bg-color", nightCheck.checked ? "#202030" : "#FEFEFE");
-		root.style.setProperty("--text-color", nightCheck.checked ? "#FEFEFE" : "#303030");
+		root.style.setProperty("--bg-color", nightCheck.checked ? "#0D1117" : "#FEFEFE");
+		root.style.setProperty("--text-color", nightCheck.checked ? "#DEDEDE" : "#303030");
 
 		root.style.setProperty("--button-bg-hover", nightCheck.checked ? "#DEDEDE" : "#AEAEAE");
 		root.style.setProperty("--button-bg-active", nightCheck.checked ? "#FEFEFE" : "#8E8E8E");
 	}
+
 
 	mapContainer.style.width = size[0] * 12 + 6 + "px";
 	mapContainer.style.height = size[1] * 12 + 6 + "px";
@@ -95,6 +153,8 @@ window.onload = () => {
 			if(opening != 0){
 				n.setAttribute("wall", opening);
 				n.className = "tile tilePath activePath";
+			} else {
+				n.setAttribute("wall", 0);
 			}
 
 			n.style.left = x * 12 + 4 + "px";
@@ -107,4 +167,28 @@ window.onload = () => {
 			mapContainer.appendChild(n);
 		}
 	}
+
+	let clicked = false;
+	let tiles = classes("tile");
+	mapContainer.addEventListener("pointerdown", e => {
+		clicked = true;
+	});
+
+	mapContainer.addEventListener("pointerup", e => {
+		clicked = false;
+	});
+
+	mapContainer.addEventListener("pointermove", e => {
+		if(clicked) {
+			let rect = mapContainer.getBoundingClientRect();
+
+			let x = parseInt((parseInt(e.clientX - rect.left) - 3) / 12) + 1;
+			let y = parseInt((parseInt(e.clientY - rect.top) - 3) / 12) + 1;
+			
+			if(x > 50) x = 50;
+			if(y > 36) y = 36;
+
+			paintTile(tiles, x, y);
+		}
+	});
 }
