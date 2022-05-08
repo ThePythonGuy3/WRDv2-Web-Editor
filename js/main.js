@@ -35,7 +35,10 @@ let actOnPath = (path, hide) => {
 let zoom = 1;
 const z_speed = 0.2;
 window.onload = () => {
+	let root = document.querySelector(":root");
+
 	let mapContainer = element("mapContainer");
+	let nightCheck = element("nightCheck");
 
 	let down = element("D");
 	let left = element("L");
@@ -56,6 +59,11 @@ window.onload = () => {
 
 	right.onchange = () => {
 		actOnPath(4, right.checked);
+	}
+
+	nightCheck.onchange = () => {
+		root.style.setProperty("--bg-color", nightCheck.checked ? "#202030" : "#FEFEFE");
+		root.style.setProperty("--text-color", nightCheck.checked ? "#FEFEFE" : "#303030");
 	}
 
 	mapContainer.style.width = size[0] * 12 + 6 + "px";
