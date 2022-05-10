@@ -9,6 +9,7 @@
 	--brush-color: var(--button-bg-active);
 	--line-color: var(--button-bg);
 	--rect-color: var(--button-bg);
+	--fill-color: var(--button-bg);
 	--select-color: var(--button-bg);
 }
 
@@ -121,6 +122,10 @@ input:checked + .slider:before {
 
 #rect {
 	background-color: var(--rect-color) !important;
+}
+
+#fill {
+	background-color: var(--fill-color) !important;
 }
 
 #select {
