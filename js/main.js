@@ -165,6 +165,25 @@ let swapMode = (root, nightCheck) => {
 	root.style.setProperty("--button-bg-active", nightCheck.checked ? "#FEFEFE" : "#8E8E8E");
 }
 
+let depth = 15;
+let getLine = (x, y, x2, y2) => {
+	let posArray = [];
+
+	for(let i = 0; i <= depth; i++){
+		let pos = [parseInt(x * (1 - i / depth) + x2 * (i / depth)), parseInt(y * (1 - i / depth) + y2 * (i / depth))];
+
+		if(!posArray.includes(pos)) posArray.push(pos);
+	}
+
+	return posArray;
+}
+
+let paintArray = (tiles, erase, array) => {
+	for(let i = 0; i < array.length; i++){
+		paintTile(tiles, erase, array[i][0], array[i][1]);
+	}
+}
+
 let zoom = 1;
 const z_speed = 0.2;
 
@@ -303,16 +322,19 @@ window.onload = () => {
 
 	let clicked = false;
 	let tiles = classes("tile");
+	let px = py = -1;
 	mapContainer.addEventListener("pointerdown", e => {
 		clicked = true;
 	});
 
 	mapContainer.addEventListener("pointerup", e => {
 		clicked = false;
+		px = py = -1;
 	});
 
 	mapContainer.addEventListener("pointerleave", e => {
 		clicked = false;
+		px = py = -1;
 	});
 
 	mapContainer.addEventListener("pointermove", e => {
@@ -325,7 +347,11 @@ window.onload = () => {
 			if(x > 50) x = 50;
 			if(y > 36) y = 36;
 
-			paintTile(tiles, erase, x, y);
+			if(px == -1) paintTile(tiles, erase, x, y);
+			else paintArray(tiles, erase, getLine(px, py, x, y));
+
+			px = x;
+			py = y;
 		}
 	});
 }
