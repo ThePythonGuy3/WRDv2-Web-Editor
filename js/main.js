@@ -63,7 +63,7 @@ let actOnPath = (tiles, path, hide) => {
 		}
 	}
 
-	clearFloor(tiles, elems[0].getAttribute("x"), elems[0].getAttribute("y"));
+	//clearFloor(tiles, elems[0].getAttribute("x"), elems[0].getAttribute("y"));    VERY BUGGY, not a great practice.
 }
 
 let getPos = (x, y) => {
@@ -127,6 +127,23 @@ let updateFloor = (tiles, x, y) => {
 	tile.children[0].src = "./resources/tiles/" + o + ".png";
 }
 
+let updatePos = (tiles, x, y) => {
+	let att = tiles[getPos(x, y)].getAttribute("block");
+	if(att == "s") updateFloor(tiles, x, y);
+	else if(att == "W") updateTile(tiles, x, y);
+}
+
+let updateArea = (tiles, x, y) => {
+	for(let x2 = -1; x2 < 2; x2++) {
+		for(let y2 = -1; y2 < 2; y2++) {
+			let pos = getPos(x + x2, y + y2);
+			if(inRange(pos)){ 
+				updatePos(tiles, x + x2, y + y2);
+			}
+		}
+	}
+}
+
 let paintTile = (tiles, erase, x, y) => {
 	let i = getPos(x - 1, y - 1);
 	if(!tiles[i].className.includes("activePath")){
@@ -152,6 +169,8 @@ let paintTile = (tiles, erase, x, y) => {
 				updateFloor(tiles, x - 1 + x2, y);
 			}
 		}
+
+		updateArea(tiles, x - 1, y - 1);
 	}
 }
 
@@ -211,6 +230,11 @@ let capitalize = s => {
 	return s[0].toUpperCase() + s.slice(1);
 };
 
+let clCp = (tiles, cpx, cpy) => {
+	if(cpx == -1) return;
+	tiles[getPos(cpx - 1, cpy - 1)].style.filter = "brightness(1.0)";
+}
+
 let zoom = 1;
 const z_speed = 0.2;
 
@@ -224,8 +248,6 @@ window.onload = () => {
 
 	let mapContainer = element("mapContainer");
 	let nightCheck = element("nightCheck");
-
-	mapContainer.addEventListener('contextmenu', event => event.preventDefault());
 
 	let down = element("D");
 	let left = element("L");
@@ -244,6 +266,8 @@ window.onload = () => {
 
 	let px = py = -1;
 	let cpx = cpy = -1;
+
+	mapContainer.addEventListener('contextmenu', event => event.preventDefault());
 
 	if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
 		nightCheck.checked = true;
@@ -290,6 +314,7 @@ window.onload = () => {
 	brush.onclick = () => {
 		tool = 1;
 
+		clCp(tiles, cpx, cpy);
 		px = py = -1;
 		cpx = cpy = -1;
 
@@ -301,6 +326,7 @@ window.onload = () => {
 	line.onclick = () => {
 		tool = 2;
 
+		clCp(tiles, cpx, cpy);
 		px = py = -1;
 		cpx = cpy = -1;
 
@@ -312,6 +338,7 @@ window.onload = () => {
 	rect.onclick = () => {
 		tool = 3;
 
+		clCp(tiles, cpx, cpy);
 		px = py = -1;
 		cpx = cpy = -1;
 
@@ -323,6 +350,7 @@ window.onload = () => {
 	fill.onclick = () => {
 		tool = 4;
 
+		clCp(tiles, cpx, cpy);
 		px = py = -1;
 		cpx = cpy = -1;
 
@@ -334,6 +362,7 @@ window.onload = () => {
 	select.onclick = () => {
 		tool = 5;
 
+		clCp(tiles, cpx, cpy);
 		px = py = -1;
 		cpx = cpy = -1;
 
@@ -390,18 +419,21 @@ window.onload = () => {
 		clicked = true;
 
 		if(tool == 1){
-			let pp = getCursorTileE(e, mapContainer);
-			paintTile(tiles, erase, pp[0], pp[1]);
+			let p = getCursorTileE(e, mapContainer);
+			paintTile(tiles, erase, p[0], p[1]);
 		} else if(tool == 2){
 			if(cpx != -1){
-				let p1 = getCursorTileE(e, mapContainer);
-				let p2 = getCursorTile(cpx, cpy, mapContainer);
+				let p = getCursorTileE(e, mapContainer);
 
-				paintArray(tiles, erase, getLine(p1[0], p1[1], p2[0], p2[1], 100));
+				paintArray(tiles, erase, getLine(p[0], p[1], cpx, cpy, 100));
+				tiles[getPos(cpx - 1, cpy - 1)].style.filter = "brightness(1.0)";
 				cpx = cpy = -1;
 			} else {
-				cpx = e.clientX;
-				cpy = e.clientY;
+				let p = getCursorTileE(e, mapContainer);
+				cpx = p[0];
+				cpy = p[1];
+
+				tiles[getPos(cpx - 1, cpy - 1)].style.filter = "brightness(10.0)";
 			}
 		}
 	});
