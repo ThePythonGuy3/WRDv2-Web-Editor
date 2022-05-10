@@ -17,7 +17,7 @@
 	user-select: none;
 }
 
-p {
+p, label {
 	font-family: verdana;
 	font-size: 15px;
 
@@ -50,6 +50,25 @@ input:checked + .slider {
 input:checked + .slider:before {
 	background-color: #EEEEEE;
 	transform: translateX(26px);
+}
+
+select {
+	border: 1px var(--button-bg) solid;
+	border-radius: 5px;
+
+	color: var(--text-color);
+
+	background-color: var(--bg-color);
+
+	transition: .4s;
+}
+
+option {
+	color: var(--text-color);
+
+	background-color: var(--bg-color);
+
+	transition: .4s;
 }
 
 #topbar {
@@ -97,6 +116,7 @@ input:checked + .slider:before {
 }
 
 #connections {
+	flex-grow: 2;
 	position: relative;
 }
 
@@ -130,6 +150,11 @@ input:checked + .slider:before {
 
 #select {
 	background-color: var(--select-color) !important;
+}
+
+#biome {
+	height: 20px;
+	width: 110px;
 }
 
 .switch {

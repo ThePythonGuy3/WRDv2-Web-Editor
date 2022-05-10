@@ -1,6 +1,12 @@
 let size = [50, 36];
 let opening = 2; // *2
 
+let biomes = [
+	"any",
+	"brick",
+	"spookastle"
+];
+
 let element = id => {
 	return document.getElementById(id);
 }
@@ -165,12 +171,19 @@ let swapMode = (root, nightCheck) => {
 	root.style.setProperty("--button-bg-active", nightCheck.checked ? "#FEFEFE" : "#8E8E8E");
 }
 
-let depth = 15;
-let getLine = (x, y, x2, y2) => {
+let getLine = (x, y, x2, y2, depth = 15) => {
+	if(x == x2 && y == y2) return [[x, y]];
+
 	let posArray = [];
 
+	let px, py;
 	for(let i = 0; i <= depth; i++){
-		let pos = [parseInt(x * (1 - i / depth) + x2 * (i / depth)), parseInt(y * (1 - i / depth) + y2 * (i / depth))];
+		if(x == x2) px = x;
+		else px = parseInt(x * (1 - i / depth) + x2 * (i / depth));
+
+		if(y == y2) py = y;
+		else py = parseInt(y * (1 - i / depth) + y2 * (i / depth));
+		let pos = [px, py];
 
 		if(!posArray.includes(pos)) posArray.push(pos);
 	}
@@ -183,6 +196,20 @@ let paintArray = (tiles, erase, array) => {
 		paintTile(tiles, erase, array[i][0], array[i][1]);
 	}
 }
+
+let getCursorTileE = (e, map) => {
+	let rect = map.getBoundingClientRect();
+	return [parseInt((parseInt(e.clientX - rect.left) - 4) / 12) + 1, parseInt((parseInt(e.clientY - rect.top)) / 12) + 1];
+}
+
+let getCursorTile = (x, y, map) => {
+	let rect = map.getBoundingClientRect();
+	return [parseInt((parseInt(x - rect.left) - 4) / 12) + 1, parseInt((parseInt(y - rect.top)) / 12) + 1];
+}
+
+let capitalize = s => {
+	return s[0].toUpperCase() + s.slice(1);
+};
 
 let zoom = 1;
 const z_speed = 0.2;
@@ -213,9 +240,23 @@ window.onload = () => {
 	let fill = element("fill");
 	let select = element("select");
 
+	let biome = element("biome");
+
+	let px = py = -1;
+	let cpx = cpy = -1;
+
 	if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
 		nightCheck.checked = true;
 		swapMode(root, nightCheck);
+	}
+
+	for(let i = 0; i < biomes.length; i++){
+		let option = create("option");
+		option.value = biomes[i];
+
+		option.innerHTML = capitalize(biomes[i]);
+
+		biome.appendChild(option);
 	}
 
 	down.onchange = () => {
@@ -236,47 +277,69 @@ window.onload = () => {
 
 	for(let i = 0; i < buttons.length; i++){
 		buttons[i].src = "./resources/icons/" + buttons[i].id + ".png";
-		buttons[i].title = buttons[i].id[0].toUpperCase() + buttons[i].id.slice(1);
+		buttons[i].title = ""
+
+		let sp = buttons[i].id.split("_");
+		buttons[i].title += capitalize(sp[0]) + " ";
+
+		for(let n = 1; n < sp.length; n++){
+			buttons[i].title += sp[n] + " ";
+		}
 	}
 
 	brush.onclick = () => {
 		tool = 1;
 
+		px = py = -1;
+		cpx = cpy = -1;
+
 		clearTools(root);
 
-		root.style.setProperty("--brush-color", getComputedStyle(root).getPropertyValue("--button-bg-active"));
+		root.style.setProperty("--brush-color", "var(--button-bg-active)");
 	}
 
 	line.onclick = () => {
 		tool = 2;
 
+		px = py = -1;
+		cpx = cpy = -1;
+
 		clearTools(root);
 
-		root.style.setProperty("--line-color", getComputedStyle(root).getPropertyValue("--button-bg-active"));
+		root.style.setProperty("--line-color", "var(--button-bg-active)");
 	}
 
 	rect.onclick = () => {
 		tool = 3;
 
+		px = py = -1;
+		cpx = cpy = -1;
+
 		clearTools(root);
 
-		root.style.setProperty("--rect-color", getComputedStyle(root).getPropertyValue("--button-bg-active"));
+		root.style.setProperty("--rect-color", "var(--button-bg-active)");
 	}
 
 	fill.onclick = () => {
 		tool = 4;
 
+		px = py = -1;
+		cpx = cpy = -1;
+
 		clearTools(root);
 
-		root.style.setProperty("--fill-color", getComputedStyle(fill).getPropertyValue("--button-bg-active"));
+		root.style.setProperty("--fill-color", "var(--button-bg-active)");
 	}
 
 	select.onclick = () => {
 		tool = 5;
 
+		px = py = -1;
+		cpx = cpy = -1;
+
 		clearTools(root);
 
-		root.style.setProperty("--select-color", getComputedStyle(root).getPropertyValue("--button-bg-active"));
+		root.style.setProperty("--select-color", "var(--button-bg-active)");
 	}
 
 	nightCheck.onchange = () => {
@@ -322,9 +385,25 @@ window.onload = () => {
 
 	let clicked = false;
 	let tiles = classes("tile");
-	let px = py = -1;
+
 	mapContainer.addEventListener("pointerdown", e => {
 		clicked = true;
+
+		if(tool == 1){
+			let pp = getCursorTileE(e, mapContainer);
+			paintTile(tiles, erase, pp[0], pp[1]);
+		} else if(tool == 2){
+			if(cpx != -1){
+				let p1 = getCursorTileE(e, mapContainer);
+				let p2 = getCursorTile(cpx, cpy, mapContainer);
+
+				paintArray(tiles, erase, getLine(p1[0], p1[1], p2[0], p2[1], 100));
+				cpx = cpy = -1;
+			} else {
+				cpx = e.clientX;
+				cpy = e.clientY;
+			}
+		}
 	});
 
 	mapContainer.addEventListener("pointerup", e => {
@@ -339,16 +418,19 @@ window.onload = () => {
 
 	mapContainer.addEventListener("pointermove", e => {
 		if(clicked) {
-			let rect = mapContainer.getBoundingClientRect();
-
-			let x = parseInt((parseInt(e.clientX - rect.left) - 4) / 12) + 1;
-			let y = parseInt((parseInt(e.clientY - rect.top)) / 12) + 1;
+			let p = getCursorTileE(e, mapContainer);
 			
+			let x = p[0],
+			y = p[1];
+
 			if(x > 50) x = 50;
 			if(y > 36) y = 36;
 
-			if(px == -1) paintTile(tiles, erase, x, y);
-			else paintArray(tiles, erase, getLine(px, py, x, y));
+			if(tool == 1) {
+				if(px != -1){
+					paintArray(tiles, erase, getLine(px, py, x, y));
+				}
+			}
 
 			px = x;
 			py = y;
