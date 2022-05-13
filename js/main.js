@@ -159,6 +159,7 @@ let paintTile = (tiles, erase, x, y) => {
 			}
 		}
 
+
 		if(inRange(getPos(x - 1, y)) && tiles[getPos(x - 1, y)].getAttribute("block") != "W") {
 			for(let x2 = -1; x2 < 2; x2++) {
 				updateFloor(tiles, x - 1 + x2, y);
@@ -230,6 +231,23 @@ let clCp = (tiles, cpx, cpy) => {
 	tiles[getPos(cpx - 1, cpy - 1)].style.filter = "brightness(1.0)";
 }
 
+let checkIfImageExists = (url, callback) => {
+	const img = new Image();
+	img.src = url;
+
+	if (img.complete) {
+		callback(true);
+	} else {
+		img.onload = () => {
+			callback(true);
+		};
+
+		img.onerror = () => {
+			callback(false);
+		};
+	}
+}
+
 let zoom = 1;
 const z_speed = 0.2;
 
@@ -238,6 +256,8 @@ let tool = 1;
 let erase = false;
 
 let initTheme = true;
+
+let fToggle = false;
 
 let tiles;
 window.onload = () => {
@@ -282,7 +302,16 @@ window.onload = () => {
 	}
 
 	for(let i = 0; i < buttons.length; i++){
-		buttons[i].src = "./resources/icons/" + buttons[i].id + ".png";
+		let url = "./resources/icons/" + buttons[i].id + ".png";
+
+		checkIfImageExists(url, e => {
+			if(e) {
+				buttons[i].src = url;
+			} else {
+				buttons[i].src = url.replace(".png", "1.png");
+			}
+		});
+
 		buttons[i].title = ""
 
 		let sp = buttons[i].id.split("_");
@@ -408,7 +437,7 @@ window.onload = () => {
 
 					for(let xx = xm; xx <= xM; xx++){
 						for(let yy = ym; yy <= yM; yy++){
-							paintTile(tiles, erase, xx, yy);
+							paintTile(tiles, erase, xx, yy, true);
 						}
 					}
 				}
