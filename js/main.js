@@ -27,15 +27,18 @@ let isOpening = (x, y) => {
 	return 0;
 }
 
-let clearFloor = (tiles, x, y) => {
-	for(let x2 = 0; x2 < 4; x2++) {
-		let tile = tiles[getPos(x + x2, y + 1)];
-		tile.setAttribute("block", "F");
-		tile.children[0].src = "./resources/tiles/F.png";
-	}
+let getPos = (x, y) => {
+	if(x < 0 || x >= size[0] || y < 0 || y >= size[1]) return -1;
+	return x + y * size[0];
+}
 
-	updateFloor(tiles, x - 1, y + 1);
-	updateFloor(tiles, x + 4, y + 1);
+let getXY = pos => {
+	if(!inRange(pos)) return [-1, -1];
+	return [pos % size[0], parseInt(pos / size[0])];
+}
+
+let inRange = p => {
+	return p >= 0 && p < 1800;
 }
 
 let actOnPath = (tiles, path, hide) => {
@@ -45,34 +48,15 @@ let actOnPath = (tiles, path, hide) => {
 		if(elems[i].getAttribute("wall") == path) {
 			elems[i].className = "tile tilePath";
 			if(hide){
-				elems[i].className += " activePath";
-				elems[i].children[0].src = "./resources/tiles/F.png";
-				elems[i].setAttribute("block", "B");
+				let x = parseInt(elems[i].getAttribute("x"));
+				let y = parseInt(elems[i].getAttribute("y"));
 
-				let x = elems[i].getAttribute("x");
-				let y = elems[i].getAttribute("y");
-				for(let x2 = -1; x2 < 2; x2++) {
-					for(let y2 = -1; y2 < 2; y2++) {
-						let pos = getPos(x - 1 + x2, y - 1 + y2);
-						if(inRange(pos)){ 
-							updateTile(tiles, x - 1 + x2, y - 1 + y2);
-						}
-					}
-				}
+				paintTile(tiles, true, x + 1, y + 1);
+
+				elems[i].className += " activePath";
 			}
 		}
 	}
-
-	//clearFloor(tiles, elems[0].getAttribute("x"), elems[0].getAttribute("y"));    VERY BUGGY, not a great practice.
-}
-
-let getPos = (x, y) => {
-	if(x < 0 || x >= size[0] || y < 0 || y >= size[1]) return -1;
-	return x + y * size[0];
-}
-
-let inRange = p => {
-	return p >= 0 && p < 1800;
 }
 
 let updateTile = (tiles, x, y) => {
@@ -109,7 +93,13 @@ let updateFloor = (tiles, x, y) => {
 
 	if(tile == undefined) return;
 
-	if(tile.getAttribute("block") == "W" || (inRange(getPos(x, y - 1)) && tiles[getPos(x, y - 1)].getAttribute("block") != "W")) return;
+	if(tile.getAttribute("block") == "W") return;
+
+	let top = tiles[getPos(x, y - 1)];
+	if(top == undefined ||(top != undefined && top.getAttribute("block") != "W")) {
+		tile.setAttribute("block", "B");
+		tile.children[0].src = "./resources/tiles/B.png";
+	}
 
 	let o = "s";
 
@@ -131,6 +121,7 @@ let updatePos = (tiles, x, y) => {
 	let att = tiles[getPos(x, y)].getAttribute("block");
 	if(att == "s") updateFloor(tiles, x, y);
 	else if(att == "W") updateTile(tiles, x, y);
+	else tiles[getPos(x, y)].children[0].src = "./resources/tiles/" + att + ".png";
 }
 
 let updateArea = (tiles, x, y) => {
@@ -146,8 +137,10 @@ let updateArea = (tiles, x, y) => {
 
 let paintTile = (tiles, erase, x, y) => {
 	let i = getPos(x - 1, y - 1);
+	if(!inRange(i)) return;
 	if(!tiles[i].className.includes("activePath")){
-		tiles[i].setAttribute("block", erase ? "B" : "W");
+		if(erase && tiles[i].getAttribute("block") == "s") return;
+		tiles[i].setAttribute("block", erase ? ((inRange(getPos(x - 1, y - 2)) && tiles[getPos(x - 1, y - 2)].getAttribute("block") == "W") ? "s" : "B") : "W");
 		let under = getPos(x - 1, y);
 
 		for(let x2 = -1; x2 < 2; x2++) {
@@ -159,12 +152,14 @@ let paintTile = (tiles, erase, x, y) => {
 			}
 		}
 
-		if(!inRange(under)) return;
-		if(tiles[under].getAttribute("block") != "W"){
-			tiles[under].setAttribute("block", "s")
+		if(!erase) {
+			if(!inRange(under)) return;
+			if(tiles[under].getAttribute("block") != "W"){
+				tiles[under].setAttribute("block", "s");
+			}
 		}
 
-		if(tiles[getPos(x - 1, y)].getAttribute("block") != "W") {
+		if(inRange(getPos(x - 1, y)) && tiles[getPos(x - 1, y)].getAttribute("block") != "W") {
 			for(let x2 = -1; x2 < 2; x2++) {
 				updateFloor(tiles, x - 1 + x2, y);
 			}
@@ -198,10 +193,10 @@ let getLine = (x, y, x2, y2, depth = 15) => {
 	let px, py;
 	for(let i = 0; i <= depth; i++){
 		if(x == x2) px = x;
-		else px = parseInt(x * (1 - i / depth) + x2 * (i / depth));
+		else px = Math.round(x * (1 - i / depth) + x2 * (i / depth));
 
 		if(y == y2) py = y;
-		else py = parseInt(y * (1 - i / depth) + y2 * (i / depth));
+		else py = Math.round(y * (1 - i / depth) + y2 * (i / depth));
 		let pos = [px, py];
 
 		if(!posArray.includes(pos)) posArray.push(pos);
@@ -243,6 +238,8 @@ let tool = 1;
 let erase = false;
 
 let initTheme = true;
+
+let tiles;
 window.onload = () => {
 	let root = document.querySelector(":root");
 
@@ -260,12 +257,13 @@ window.onload = () => {
 	let line = element("line");
 	let rect = element("rect");
 	let fill = element("fill");
-	let select = element("select");
 
 	let biome = element("biome");
 
 	let px = py = -1;
 	let cpx = cpy = -1;
+
+	let clicked = false;
 
 	mapContainer.addEventListener('contextmenu', event => event.preventDefault());
 
@@ -281,22 +279,6 @@ window.onload = () => {
 		option.innerHTML = capitalize(biomes[i]);
 
 		biome.appendChild(option);
-	}
-
-	down.onchange = () => {
-		actOnPath(tiles, 1, down.checked);
-	}
-
-	left.onchange = () => {
-		actOnPath(tiles, 2, left.checked);
-	}
-
-	up.onchange = () => {
-		actOnPath(tiles, 3, up.checked);
-	}
-
-	right.onchange = () => {
-		actOnPath(tiles, 4, right.checked);
 	}
 
 	for(let i = 0; i < buttons.length; i++){
@@ -359,17 +341,6 @@ window.onload = () => {
 		root.style.setProperty("--fill-color", "var(--button-bg-active)");
 	}
 
-	select.onclick = () => {
-		tool = 5;
-
-		clCp(tiles, cpx, cpy);
-		px = py = -1;
-		cpx = cpy = -1;
-
-		clearTools(root);
-
-		root.style.setProperty("--select-color", "var(--button-bg-active)");
-	}
 
 	nightCheck.onchange = () => {
 		swapMode(root, nightCheck);
@@ -385,7 +356,7 @@ window.onload = () => {
 			let n2 = create("img");
 
 			n.tabIndex = 1;
-			n2.src = "./resources/tiles/F.png"
+			n2.src = "./resources/tiles/B.png"
 			n2.tabIndex = 1;
 			n2.innerHTML = " ";
 			n.className = "tile";
@@ -412,20 +383,36 @@ window.onload = () => {
 		}
 	}
 
-	let clicked = false;
-	let tiles = classes("tile");
+	tiles = classes("tile");
 
 	mapContainer.addEventListener("pointerdown", e => {
 		clicked = true;
+		erase = e.which == 3;
 
 		if(tool == 1){
 			let p = getCursorTileE(e, mapContainer);
 			paintTile(tiles, erase, p[0], p[1]);
-		} else if(tool == 2){
+		} else {
 			if(cpx != -1){
-				let p = getCursorTileE(e, mapContainer);
+				if(tool == 2){
+					let p = getCursorTileE(e, mapContainer);
 
-				paintArray(tiles, erase, getLine(p[0], p[1], cpx, cpy, 100));
+					paintArray(tiles, erase, getLine(p[0], p[1], cpx, cpy, 100));
+				} else if(tool == 3){
+					let p = getCursorTileE(e, mapContainer);
+
+					let xm = (p[0] < cpx) ? p[0] : cpx;
+					let ym = (p[1] < cpy) ? p[1] : cpy;
+					let xM = (p[0] > cpx) ? p[0] : cpx;
+					let yM = (p[1] > cpy) ? p[1] : cpy;
+
+					for(let xx = xm; xx <= xM; xx++){
+						for(let yy = ym; yy <= yM; yy++){
+							paintTile(tiles, erase, xx, yy);
+						}
+					}
+				}
+
 				tiles[getPos(cpx - 1, cpy - 1)].style.filter = "brightness(1.0)";
 				cpx = cpy = -1;
 			} else {
@@ -468,4 +455,20 @@ window.onload = () => {
 			py = y;
 		}
 	});
+
+	down.onchange = () => {
+		actOnPath(tiles, 1, down.checked);
+	}
+
+	left.onchange = () => {
+		actOnPath(tiles, 2, left.checked);
+	}
+
+	up.onchange = () => {
+		actOnPath(tiles, 3, up.checked);
+	}
+
+	right.onchange = () => {
+		actOnPath(tiles, 4, right.checked);
+	}
 }
