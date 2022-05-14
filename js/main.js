@@ -135,7 +135,7 @@ let updateArea = (tiles, x, y) => {
 	}
 }
 
-let paintTile = (tiles, erase, x, y) => {
+let paintTile = (tiles, erase, x, y, update = true) => {
 	let i = getPos(x - 1, y - 1);
 	if(!inRange(i)) return;
 	if(!tiles[i].className.includes("activePath")){
@@ -166,7 +166,9 @@ let paintTile = (tiles, erase, x, y) => {
 			}
 		}
 
-		updateArea(tiles, x - 1, y - 1);
+		if(update) {
+			updateArea(tiles, x - 1, y - 1);
+		}
 	}
 }
 
@@ -246,6 +248,10 @@ let checkIfImageExists = (url, callback) => {
 			callback(false);
 		};
 	}
+}
+
+let floodFill = (tiles, x, y) => {
+	//e
 }
 
 let zoom = 1;
@@ -418,18 +424,17 @@ window.onload = () => {
 		clicked = true;
 		erase = e.which == 3;
 
+		let p = getCursorTileE(e, mapContainer);
+
+		if(!inRange(getPos(p[0]-1, p[1]-1))) return;
+
 		if(tool == 1){
-			let p = getCursorTileE(e, mapContainer);
 			paintTile(tiles, erase, p[0], p[1]);
 		} else {
 			if(cpx != -1){
 				if(tool == 2){
-					let p = getCursorTileE(e, mapContainer);
-
 					paintArray(tiles, erase, getLine(p[0], p[1], cpx, cpy, 100));
 				} else if(tool == 3){
-					let p = getCursorTileE(e, mapContainer);
-
 					let xm = (p[0] < cpx) ? p[0] : cpx;
 					let ym = (p[1] < cpy) ? p[1] : cpy;
 					let xM = (p[0] > cpx) ? p[0] : cpx;
@@ -437,7 +442,14 @@ window.onload = () => {
 
 					for(let xx = xm; xx <= xM; xx++){
 						for(let yy = ym; yy <= yM; yy++){
-							paintTile(tiles, erase, xx, yy, true);
+							paintTile(tiles, erase, xx, yy, false);
+						}
+					}
+
+					for(let xx = xm; xx <= xM; xx++){
+						for(let yy = ym; yy <= yM; yy++){
+							if(xx == xm || xx == xM || yy == ym || yy == yM) updateArea(tiles, xx-1, yy-1);
+							else updatePos(tiles, xx-1, yy-1);
 						}
 					}
 				}
