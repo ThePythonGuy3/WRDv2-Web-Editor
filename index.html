@@ -11,6 +11,7 @@
 		<link rel="stylesheet" href="./css/main.css">
 
 		<script type="text/javascript" src="./js/main.js"></script>
+		<script src="./js/FileSaver.js"></script>
 	</head>
 	<body style="postition: absolute; top: 0; left: 0; margin: 0; overflow: hidden; width: 100vw; height: 100vh;" ondragstart="return false">
 		<div id="topbar">
@@ -25,7 +26,11 @@
 
 		<div id="main">
 			<div id="mapPureContainer">
-				<div style="display: flex;">
+				<div style="height: 15px"></div>
+				<label for="name">Name:</label>
+				<input type="text" name="name" id="name" value="Room">
+
+				<div style="display: flex; margin-top: -8px;">
 					<p>Connections:</p>
 
 					<div id="connections">
@@ -64,7 +69,6 @@
 						<img tabindex=1 class="toolButton" id="new_file">
 						<img tabindex=1 class="toolButton" id="open">
 						<img tabindex=1 class="toolButton" id="save">
-						<img tabindex=1 class="toolButton" id="save_as">
 						<div class="separator"></div>
 						<img tabindex=1 class="toolButton" id="undo">
 						<img tabindex=1 class="toolButton" id="redo">

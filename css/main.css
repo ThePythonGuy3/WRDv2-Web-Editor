@@ -41,6 +41,9 @@ img {
 input {
 	font-family: verdana;
 	font-size: 15px;
+
+	border: 1px var(--button-bg) solid;
+	border-radius: 5px;
 }
 
 input:checked + .slider {
@@ -211,7 +214,7 @@ option {
 }
 
 .tile:hover {
-	filter: brightness(0.5);
+	filter: brightness(0.5) !important;
 }
 
 .tile:active {
