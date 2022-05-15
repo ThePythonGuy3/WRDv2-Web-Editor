@@ -338,8 +338,8 @@ let redo = (tiles) => {
 	loadChange(tiles);
 }
 
-let tilesAsWRDv2 = (biome, conn, tiles) => {
-	let f = biome + ";" + conn + ";";
+let tilesAsWRDv2 = (name, biome, conn, tiles) => {
+	let f = name + ";" + biome + ";" + conn + ";";
 	for(let x = 0; x < size[0]; x++){
 		for(let y = 0; y < size[1]; y++){
 			let t = tiles[getPos(x, y)];
@@ -354,6 +354,35 @@ let tilesAsWRDv2 = (biome, conn, tiles) => {
 	}
 
 	return f.replace(new RegExp("\.$"), "");;
+}
+
+let loadWRDv2 = (data, nameC, biomeC, cons, tiles) => {
+	let sp = data.split(";");
+	let name = sp[0];
+	let biome = sp[1];
+	let conn = sp[2];
+	let room = sp[3].split(".");
+
+	nameC.value = name;
+	biomeC.options[biomes.indexOf(biome)].selected = true;
+
+	for(let i = 0; i < 4; i++){
+		cons[i].checked = false;
+	}
+
+	if(conn.includes("D")) cons[0].checked = true;
+	if(conn.includes("L")) cons[1].checked = true;
+	if(conn.includes("U")) cons[2].checked = true;
+	if(conn.includes("R")) cons[3].checked = true;
+
+	for(let x = 0; x < size[0]; x++){
+		for(let y = 0; y < size[1]; y++){
+			let p = getPos(x, y);
+			tiles[p].setAttribute("block", room[y + x * size[1]]);
+		}
+	}
+
+	updateAll(tiles);
 }
 
 let tool = 1;
@@ -372,6 +401,8 @@ window.onload = () => {
 	let mapContainer = element("mapContainer");
 	let nightCheck = element("nightCheck");
 
+	let chooseFile = element("chooseFile");
+
 	let name = element("name");
 
 	let down = element("D");
@@ -388,6 +419,7 @@ window.onload = () => {
 
 	let floorToggle = element("mode");
 
+	let openB = element("open");
 	let save = element("save");
 	let undoB = element("undo");
 	let redoB = element("redo");
@@ -498,11 +530,23 @@ window.onload = () => {
 		if(up.checked) conn += "U";
 		if(right.checked) conn += "R";
 
-		let data = tilesAsWRDv2(biome.value, conn, tiles);
+		let data = tilesAsWRDv2(name.value, biome.value, conn, tiles);
 
 		let blob = new Blob([data], { type: "text/plain;charset=utf-8" });
 		saveAs(blob, name.value.toLowerCase().replace(" ", "_") + ".wrdv2", { type: "text/plain;charset=utf-8" });
 	}
+
+	openB.onclick = () => {
+		chooseFile.click();
+	}
+
+	chooseFile.addEventListener("change", () => {
+		let file = chooseFile.files[0];
+
+		file.text().then(e => {
+			loadWRDv2(e, name, biome, [down, left, up, right], tiles);
+		});
+	});
 
 	undoB.onclick = () => undo(tiles);
 	redoB.onclick = () => redo(tiles);
