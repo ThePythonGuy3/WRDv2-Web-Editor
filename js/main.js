@@ -385,6 +385,18 @@ let loadWRDv2 = (data, nameC, biomeC, cons, tiles) => {
 	updateAll(tiles);
 }
 
+let fillCanvas = (tiles, canvas, context) => {
+	context.clearRect(0, 0, 8*50, 8*36);
+
+	for(let i = 0; i < tiles.length; i++){
+		let t = tiles[i];
+		let im = new Image(16, 16);
+		im.src = t.children[0].src;
+
+		context.drawImage(im, t.getAttribute("x")*8, t.getAttribute("y")*8, 8, 8);
+	}
+}
+
 let tool = 1;
 
 let erase = false;
@@ -424,7 +436,17 @@ window.onload = () => {
 	let undoB = element("undo");
 	let redoB = element("redo");
 
+	let newFile = element("new_file");
+
 	let biome = element("biome");
+
+	let canvas = element("canvas");
+	let context = canvas.getContext("2d");
+
+	let popup = element("popup");
+	let exit = element("exit");
+
+	let help = element("help");
 
 	let px = py = -1;
 	let cpx = cpy = -1;
@@ -518,6 +540,10 @@ window.onload = () => {
 		root.style.setProperty("--fill-color", "var(--button-bg-active)");
 	}
 
+	help.onclick = () => {
+		window.open("./resources/help.pdf");
+	}
+
 	floorToggle.onclick = () => {
 		floor = !floor;
 		floorToggle.src = "./resources/icons/mode" + (floor + 1) + ".png";
@@ -546,10 +572,22 @@ window.onload = () => {
 		file.text().then(e => {
 			loadWRDv2(e, name, biome, [down, left, up, right], tiles);
 		});
+
+		chooseFile.value = "";
 	});
 
 	undoB.onclick = () => undo(tiles);
 	redoB.onclick = () => redo(tiles);
+
+	visualize.onclick = () => {
+		fillCanvas(tiles, canvas, context);
+
+		popup.style.display = "flex";
+	}
+
+	exit.onclick = () =>{
+		popup.style.display = "none";
+	}
 
 
 	nightCheck.onchange = () => {
@@ -595,6 +633,15 @@ window.onload = () => {
 
 	tiles = classes("tile");
 	recordChange(tiles);
+
+	newFile.onclick = () => {
+		if(confirm("Are you sure you want to clear your canvas?")){
+			for(let i = 0; i < tiles.length; i++){
+				tiles[i].setAttribute("block", "B");
+			}
+			updateAll(tiles);
+		}
+	}
 
 	mapContainer.addEventListener("pointerdown", e => {
 		clicked = true;
@@ -646,18 +693,20 @@ window.onload = () => {
 				tiles[getPos(cpx - 1, cpy - 1)].style.filter = "brightness(10.0)";
 			}
 		}
-
-		if(floor) updateAll(tiles);
 	});
 
 	mapContainer.addEventListener("pointerup", e => {
-		if(clicked && tool != 4) recordChange(tiles);
+		if(clicked && tool != 4) {
+			recordChange(tiles);
+		}
+		if(floor) updateAll(tiles);
 		clicked = false;
 		px = py = -1;
 	});
 
 	mapContainer.addEventListener("pointerleave", e => {
 		if(clicked) recordChange(tiles);
+		if(floor) updateAll(tiles);
 		clicked = false;
 		px = py = -1;
 	});
@@ -699,3 +748,7 @@ window.onload = () => {
 		actOnPath(tiles, 4, right.checked);
 	}
 }
+
+window.onbeforeunload = function() {
+	return 1;
+};

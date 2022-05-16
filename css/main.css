@@ -129,6 +129,8 @@ option {
 	top: 20px;
 
 	right: 10px;
+
+	z-index: 10002;
 }
 
 #tools {
@@ -158,6 +160,20 @@ option {
 #biome {
 	height: 20px;
 	width: 110px;
+}
+
+#exit {
+	background-color: var(--button-bg);
+	transition: 300ms;
+}
+
+#exit:hover {
+	background-color: var(--button-bg-hover);
+}
+
+#exit:active {
+	background-color: var(--button-bg-active);
+	transition: 50ms;
 }
 
 .switch {
