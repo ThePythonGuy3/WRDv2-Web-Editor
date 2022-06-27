@@ -1,4 +1,4 @@
-let size = [50, 36];
+let size = [30, 20];
 let opening = 2; // *2
 
 let biomes = [
@@ -340,20 +340,23 @@ let redo = (tiles) => {
 
 let tilesAsWRDv2 = (name, biome, conn, tiles) => {
 	let f = name + ";" + biome + ";" + conn + ";";
-	for(let x = 0; x < size[0]; x++){
-		for(let y = 0; y < size[1]; y++){
+	for(let y = 0; y < size[1]; y++){
+		for(let x = 0; x < size[0]; x++){
 			let t = tiles[getPos(x, y)];
 
 			let s = "";
 			if(t.className.includes("activePath")) s = "F";
 			s = t.getAttribute("block");
 
-			if(s != "W" && inRange(getPos(x, y - 1)) && tiles[getPos(x, y - 1)].getAttribute("block") == "W") s = "s";
-			f += s + ".";
+			if(s == "s") s = "B";
+
+			if(x < size[0] - 1) f += s + ".";
+			else f += s;
 		}
+		f += ";";
 	}
 
-	return f.replace(new RegExp("\.$"), "");;
+	return f.replace(new RegExp("\.$"), "");
 }
 
 let loadWRDv2 = (data, nameC, biomeC, cons, tiles) => {
@@ -386,7 +389,7 @@ let loadWRDv2 = (data, nameC, biomeC, cons, tiles) => {
 }
 
 let fillCanvas = (tiles, canvas, context) => {
-	context.clearRect(0, 0, 8*50, 8*36);
+	context.clearRect(0, 0, 8*size[0], 8*size[1]);
 
 	for(let i = 0; i < tiles.length; i++){
 		let t = tiles[i];
