@@ -346,9 +346,11 @@ let tilesAsWRDv2 = (name, biome, conn, tiles) => {
 
 			let s = "";
 			if(t.className.includes("activePath")) s = "F";
-			s = t.getAttribute("block");
+			else {
+				s = t.getAttribute("block");
 
-			if(s == "s") s = "B";
+				if(s == "s") s = "B";
+			}
 
 			if(x < size[0] - 1) f += s + ".";
 			else f += s;
