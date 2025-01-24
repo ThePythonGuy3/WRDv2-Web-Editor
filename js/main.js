@@ -564,7 +564,7 @@ window.onload = () => {
 		let data = tilesAsWRDv2(name.value, biome.value, conn, tiles);
 
 		let blob = new Blob([data], { type: "text/plain;charset=utf-8" });
-		saveAs(blob, name.value.toLowerCase().replace(" ", "_") + ".wrdv2", { type: "text/plain;charset=utf-8" });
+		saveAs(blob, name.value.toLowerCase().replace(" ", "_") + ".txt", { type: "text/plain;charset=utf-8" });
 	}
 
 	openB.onclick = () => {
