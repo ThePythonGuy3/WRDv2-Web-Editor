@@ -367,15 +367,11 @@ let loadWRDv2 = (data, nameC, biomeC, cons, tiles) => {
 	let biome = sp[1];
 	let conn = sp[2];
 	let room = sp[3].split(".");
-
-	console.log(sp);
 	
 	for (let i = 4; i < sp.length; i++)
 	{
-		room.concat(sp[i].split("."));
+		room = room.concat(sp[i].split("."));
 	}
-
-	console.log(room);
 
 	nameC.value = name;
 	biomeC.options[biomes.indexOf(biome)].selected = true;
@@ -392,7 +388,7 @@ let loadWRDv2 = (data, nameC, biomeC, cons, tiles) => {
 	for(let x = 0; x < size[0]; x++){
 		for(let y = 0; y < size[1]; y++){
 			let p = getPos(x, y);
-			tiles[p].setAttribute("block", room[y + x * size[1]]);
+			tiles[p].setAttribute("block", room[x + y * size[0]]);
 		}
 	}
 
