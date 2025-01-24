@@ -373,6 +373,8 @@ let loadWRDv2 = (data, nameC, biomeC, cons, tiles) => {
 		room.concat(sp[i].split("."));
 	}
 
+	console.log(room);
+
 	nameC.value = name;
 	biomeC.options[biomes.indexOf(biome)].selected = true;
 
